@@ -1,3 +1,5 @@
+Just a little piece of code to get the number of skillbooks (or any item really) from a corp container in EVE Online.
+
 Requirements:
 * Get a sqlite DB dump from https://www.fuzzwork.co.uk/dump/, decompress it, rename it if you want to
 * Depends on evelink: https://github.com/eve-val/evelink
