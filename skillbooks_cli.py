@@ -9,5 +9,5 @@ from skillbooks_stock import get_quantities
 
 quantities = get_quantities()
 
-for name, quantity in quantities.iteritems():
-    print name, quantity["quantity"]
+for quantity in quantities:
+    print quantity["name"], quantity["quantity"]
