@@ -10,7 +10,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        bookquantities = sorted(get_quantities(), key=lambda quantity: quantity['class']+quantity['name'])
+        bookquantities = sorted(get_quantities(True), key=lambda quantity: quantity['class']+quantity['name'])
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render({'bookquantities': bookquantities}))
 
