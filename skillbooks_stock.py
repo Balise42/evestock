@@ -1,12 +1,11 @@
 import evelink
 
 from keys import keyid, vcode
-from config import stationid, smallcontainerid, dbname, booklist, bookids
+from config import stationid, containername, dbname, booklist, bookids
 
 eve = evelink.eve.EVE()
 vn = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
-# containers are in station -> content -> office -> contents
 assets = vn.assets().result[stationid]["contents"][0]["contents"]
 
 def get_item_ids_from_db_dump():
@@ -19,11 +18,29 @@ def get_item_ids_from_db_dump():
         itemsbyid[int(id)] = name
     return items, itemsbyid
 
-def get_quantities(allitems):
-    # find the container
+def get_container():
+    # containers are in station -> content -> office -> contents
+    ids = []
     for asset in assets:
-        if asset['id'] == smallcontainerid:
-            skillbooks = asset['contents']
+        # to check if an asset is a container which we can access,
+        # we simply check if it has contents
+        if "contents" in asset:
+            ids.append(asset["id"])
+
+        
+    # and then we go through the Locations to find the right one
+    locs = vn.locations(ids).result
+    for id, loc in locs.iteritems():
+        if loc['name'] == containername:
+            for asset in assets:
+                if asset['id'] == id:
+                    return asset['contents']
+
+
+def get_quantities(allitems):
+    skillbooks = get_container()
+
+    # find the container
 
     # enumerate the container with the items that are in it
     quantities = {}
