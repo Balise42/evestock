@@ -7,7 +7,7 @@ eve = evelink.eve.EVE()
 vn = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
 # containers are in station -> content -> office -> contents
-assets = vn.assets()[stationid]["contents"][0]["contents"]
+assets = vn.assets().result[stationid]["contents"][0]["contents"]
 
 def get_item_ids_from_db_dump():
     lines = [s.strip() for s in open(bookids)]
