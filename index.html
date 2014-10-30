@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html lang="en">
+<head>
+  <title>V.N. skillbooks stock</title>
+  <link rel="stylesheet" href=/css/bootstrap.min.css" />
+</head>
+<body>
+  <div class="container">
+  <h1>V.N. skillbooks stock</h1>
+  <div class="row">
+    <div class="span12">
+      <table class="table">
+        <th>
+          <td>Name</td>
+          <td>Current stock</td>
+        </th>
+        {% for bookquantity in bookquantities %}
+        <tr class= {{bookquantity.class}}>
+          <td>
+            {{ bookquantity.name }}
+          </td>
+          <td>
+            {{bookquantity.quantity}}
+          </td>
+        </tr>
+        {% end for %}
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+{% endautoescape %}
