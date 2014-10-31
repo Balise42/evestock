@@ -1,10 +1,17 @@
 import evelink
+from google.appengine.api import memcache
 
 from keys import keyid, vcode
-from config import stationid, containername, dbname, booklist, bookids
+from config import containername, dbname, booklist, bookids
+from update_ids import get_container_id, get_station_id
 
 eve = evelink.eve.EVE()
 vn = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
+
+stationid = memcache.get("stationid")
+if(stationid is None):
+    stationid = get_station_id()
+    memcache.add("stationid", stationid)
 
 assets = vn.assets().result[stationid]["contents"][0]["contents"]
 
@@ -19,22 +26,14 @@ def get_item_ids_from_db_dump():
     return items, itemsbyid
 
 def get_container():
-    # containers are in station -> content -> office -> contents
-    ids = []
-    for asset in assets:
-        # to check if an asset is a container which we can access,
-        # we simply check if it has contents
-        if "contents" in asset:
-            ids.append(asset["id"])
+    containerid = memcache.get("containerid")
+    if(containerid is None):
+        containerid = get_container_id()
+        memcache.add("containerid", containerid)
 
-        
-    # and then we go through the Locations to find the right one
-    locs = vn.locations(ids).result
-    for id, loc in locs.iteritems():
-        if loc['name'] == containername:
-            for asset in assets:
-                if asset['id'] == id:
-                    return asset['contents']
+    for asset in assets:
+        if asset['id'] == containerid:
+            return asset['contents']
 
 
 def get_quantities(allitems):

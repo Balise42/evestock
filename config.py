@@ -5,3 +5,4 @@ containername = 'Skillbooks' #container name
 dbname = "eve-dump.db"
 booklist = "skillbooks-list"
 bookids = "skillbooks-ids"
+stationname = "4-07MU V - The Thalamus"
