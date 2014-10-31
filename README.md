@@ -2,12 +2,19 @@ Just a little piece of code to get the number of skillbooks (or any item really)
 
 Requirements:
 * Depends on evelink: https://github.com/eve-val/evelink
+* is mostly a Google App Engine app, although there's a CLI that also gives results. You can also download a development appserver (https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) to run it locally.
 * Create a file keys.py containing your keyid and vcode for a corp API key that can access assets. File should look like
 ```python
 keyid = your_key_id
 vcode = 'your_vcode'
 ```
 * Put the skillbooks you're interested in in the "skillbooks-list" file (or another file if you want to)
-* Configure the app in config.py: sysid is the system id, stationid is the station id, smallcontainerid is the container containing the skillbooks, dbname is the database dump file name, booklist is the skillbook list file name (the books that you want to track), bookids is the DB dump for the id-name matching in the DB.
+* Configure the app in config.py: 
+  - stationname is the station name
+  - container name is the container name that you're interested in
+  - dbname is the name of the sqlite db containing eve static data - only useful if you want to regenerate the item ids list
+  - booklist is the list of skillbooks (or items) to track
+  - bookids is the fil containing the id <-> item name list (from eve static dump, generated with skillbooks_id_export.py
+  - allitems is a Boolean - True if we want to return all the items in the container, False to return only those tracked in the list
 * Check with skillbooks-cli.py that everything works: it should display the skillbooks of your list followed by the number of books in the hangar. ERROR in the skillbooks list means that you probably have a typo in the skillbook name, or that your sqlite DB dump is not up to date (esp. with recent-ish skill namechanges).
 * To update the item list (skillbooks-ids, by default), get a sqlite DB dump from https://www.fuzzwork.co.uk/dump/, decompress it, rename it if you want to (default is eve-dump.db), and start skillbooks_id_export.py.
