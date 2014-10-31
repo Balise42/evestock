@@ -3,7 +3,7 @@ Just a little piece of code to get the number of skillbooks (or any item really)
 Requirements:
 * Depends on evelink: https://github.com/eve-val/evelink
 * is mostly a Google App Engine app, although there's a CLI that also gives results. You can also download a development appserver (https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) to run it locally.
-* Create a file keys.py containing your keyid and vcode for a corp API key that can access assets. File should look like
+* Create a file keys.py containing your keyid and vcode for a corp API key that can access Assets and Locations. File should look like
 ```python
 keyid = your_key_id
 vcode = 'your_vcode'
