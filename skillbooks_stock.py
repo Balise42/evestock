@@ -1,20 +1,30 @@
 import evelink
-from google.appengine.api import memcache
+withmemcache = True
+try:
+    from google.appengine.api import memcache
+except ImportError:
+    withmemcache = False
 
 from keys import keyid, vcode
-from config import containername, dbname, booklist, bookids
+from config import containername, dbname, booklist, bookids, allitems
 from update_ids import get_container_id, get_station_id
 
 eve = evelink.eve.EVE()
 vn = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
-stationid = memcache.get("stationid")
-if(stationid is None):
+#get the station id and the assets of corp in station
+if withmemcache:
+    stationid = memcache.get("stationid")
+    if(stationid is None):
+        stationid = get_station_id()
+        if withmemcache:
+            memcache.add("stationid", stationid)
+else:
     stationid = get_station_id()
-    memcache.add("stationid", stationid)
 
 assets = vn.assets().result[stationid]["contents"][0]["contents"]
 
+# get file containing id<-> item name in memory for query
 def get_item_ids_from_db_dump():
     lines = [s.strip() for s in open(bookids)]
     items = {}
@@ -25,18 +35,22 @@ def get_item_ids_from_db_dump():
         itemsbyid[int(id)] = name
     return items, itemsbyid
 
+# get the right container
 def get_container():
-    containerid = memcache.get("containerid")
-    if(containerid is None):
+    if(withmemcache):
+        containerid = memcache.get("containerid")
+        if(containerid is None):
+            containerid = get_container_id()
+            memcache.add("containerid", containerid)
+    else:
         containerid = get_container_id()
-        memcache.add("containerid", containerid)
 
     for asset in assets:
         if asset['id'] == containerid:
             return asset['contents']
 
-
-def get_quantities(allitems):
+# get quantities of items in container
+def get_quantities():
     skillbooks = get_container()
 
     # find the container

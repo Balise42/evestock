@@ -1,5 +1,9 @@
 import evelink
-from google.appengine.api import memcache
+withmemcache = True
+try:
+    from google.appengine.api import memcache
+except ImportError:
+    withmemcache = False
 
 from keys import keyid, vcode
 from config import stationname, containername
@@ -9,10 +13,13 @@ eve = evelink.eve.EVE()
 vn = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
 def get_container_id():
-    stationid = memcache.get("stationid")
-    if(stationid is None):
+    if withmemcache:
+        stationid = memcache.get("stationid")
+        if(stationid is None):
+            stationid = get_station_id()
+            memcache.add("stationid", stationid)
+    else:
         stationid = get_station_id()
-        memcache.add("stationid", stationid)
 
     assets = vn.assets().result[stationid]["contents"][0]["contents"]
     # containers are in station -> content -> office -> contents
