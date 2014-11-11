@@ -22,7 +22,8 @@ class Station:
     else:
       self.fetch_station_id_from_api()
         
-      
+  
+  #TODO add code for non-conquerable stations
   def fetch_station_id_from_api(self):
     stations = self.eve.conquerable_stations().result
     for stationid, station in stations.iteritem():
