@@ -5,13 +5,10 @@ try:
 except ImportError:
   withmemcache = False
 
-from keys import keyid, vcode
-
 class Station:
   def __init__(self, stationname):
     self.stationname = stationname
     self.eve = evelink.eve.EVE()
-    self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
   def fetch_station_id(self):
     if withmemcache:
