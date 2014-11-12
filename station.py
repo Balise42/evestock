@@ -5,11 +5,13 @@ try:
 except ImportError:
   withmemcache = False
 
+from keys import keyid, vcode
+
 class Station:
   def __init__(self, stationname):
     self.stationname = stationname
     self.eve = evelink.eve.EVE()
-    self.corp = evelink.corp.Corp(evelink.API(api_key = (keyid, vcode)))
+    self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
   def fetch_station_id(self):
     if withmemcache:
@@ -47,8 +49,8 @@ class Station:
   #TODO add code for non-conquerable stations
   def fetch_station_id_from_api(self):
     stations = self.eve.conquerable_stations().result
-    for stationid, station in stations.iteritem():
-      if station["name"] == self.stationnname:
+    for stationid, station in stations.iteritems():
+      if station["name"] == self.stationname:
         self.stationid = stationid+6000000
 
   def fetch_station_id_from_cache(self):
