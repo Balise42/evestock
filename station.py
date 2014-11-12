@@ -9,6 +9,7 @@ class Station:
   def __init__(self, stationname):
     self.stationname = stationname
     self.eve = evelink.eve.EVE()
+    self.fetch_station_id()
 
   def fetch_station_id(self):
     if withmemcache:
