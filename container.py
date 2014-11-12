@@ -7,7 +7,13 @@ class Container:
     self.containername = containername
     self.eve = evelink.eve.EVE()
     self.corp = evelink.corp.Corp(evelink.API(api_key = (keyid, vcode)))
-    container.fetch_container_id()
+    self.fetch_contents
+
+  def fetch_contents(self):
+    self.fetch_container_id()
+    if self.containerid = None:
+      throw 
+
 
   def fetch_container_id(self):
     containerids = get_container_ids()
