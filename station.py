@@ -38,13 +38,20 @@ class Station:
     
   def fetch_assets(self):
     self.fetch_office_if_none(self)
-    self.assets = self.office["contents"] 
+    self.assets = self.office["contents"]
+    return self.assets
 
   def fetch_office_if_none(self):
     if self.office is None:
       stationid = station.stationid
       self.office = self.corp.assets().result[stationid]["contents"][0]
-  
+ 
+  def get_content_from_container(self, containerid):
+    assets = self.fetch_assets()
+    for asset in assets:
+      if asset['id'] == containerid and is_container(asset['id']):
+        return asset['contents']
+    raise('Could not find the container contents')
     
   #TODO add code for non-conquerable stations
   def fetch_station_id_from_api(self):
