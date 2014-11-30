@@ -24,7 +24,7 @@ class Container:
 
   def fetch_container_id(self):
     if withmemcache:
-      self.fetch_station_id_from_cache()
+      self.fetch_container_id_from_cache()
       if(self.containerid is None):
         self.fetch_container_id_from_api()
         self.store_container_id_in_cache()
@@ -32,7 +32,7 @@ class Container:
       self.fetch_container_id_from_api()
 
   def fetch_container_id_from_cache(self):
-    self.stationid = memcache.get("containerid")
+    self.containerid = memcache.get("containerid")
 
   def store_container_id_in_cache(self):
     memcache.add("containerid", self.containerid)

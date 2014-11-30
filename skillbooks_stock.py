@@ -1,3 +1,4 @@
+import logging
 import evelink
 withmemcache = True
 try:
@@ -22,6 +23,7 @@ if withmemcache:
 else:
     stationid = get_station_id()
 
+logging.info("Station ID: %s", stationid)
 assets = vn.assets().result[stationid]["contents"][0]["contents"]
 
 # get file containing id<-> item name in memory for query

@@ -1,4 +1,5 @@
 import evelink
+import logging
 withmemcache = True
 try:
   from google.appengine.api import memcache
@@ -22,6 +23,7 @@ class Station:
         self.store_station_id_in_cache()
     else:
       self.fetch_station_id_from_api()
+    logging.info("%s", self.stationid)
         
   def get_all_container_ids(self):
     self.fetch_assets()
@@ -58,9 +60,11 @@ class Station:
   #TODO add code for non-conquerable stations
   def fetch_station_id_from_api(self):
     stations = self.eve.conquerable_stations().result
-    for stationid, station in stations.iteritems():
+    for stationid, station in sorted(stations.iteritems()):
       if station["name"] == self.stationname:
+        logging.info("%s", station["name"])
         self.stationid = stationid+6000000
+    return self.stationid
 
   def fetch_station_id_from_cache(self):
     self.stationid = memcache.get("stationid")
