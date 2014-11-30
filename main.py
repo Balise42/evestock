@@ -2,7 +2,7 @@ import webapp2
 import jinja2
 import os
 
-from skillbooks_stock import get_quantities 
+from stock import Stock
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), 
@@ -10,9 +10,10 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        bookquantities = sorted(get_quantities(), key=lambda quantity: quantity['class']+quantity['name'])
-        template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render({'bookquantities': bookquantities}))
+      stock = Stock()
+      bookquantities = sorted(stock.list_of_items, key=lambda quantity: quantity['class']+quantity['name'])
+      template = JINJA_ENVIRONMENT.get_template('index.html')
+      self.response.write(template.render({'bookquantities': bookquantities}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
