@@ -11,6 +11,7 @@ class Station:
   def __init__(self, stationname):
     self.stationname = stationname
     self.eve = evelink.eve.EVE()
+    self.office = None
     self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
 
   def fetch_station_id(self):
@@ -23,27 +24,27 @@ class Station:
       self.fetch_station_id_from_api()
         
   def get_all_container_ids(self):
-    fetch_assets()
-    containerids = list_asset_if_container()
+    self.fetch_assets()
+    containerids = self.list_asset_if_container()
     return containerids
 
   def list_asset_if_container(self):
     containerids = []
-    for asset in self.asset:
-      if is_container(asset):
+    for asset in self.assets:
+      if self.is_container(asset):
         containerids.append(asset["id"])
 
-  def is_container(asset):
+  def is_container(self, asset):
     return "contents" in asset
     
   def fetch_assets(self):
-    self.fetch_office_if_none(self)
+    self.fetch_office_if_none()
     self.assets = self.office["contents"]
     return self.assets
 
   def fetch_office_if_none(self):
     if self.office is None:
-      stationid = station.stationid
+      stationid = self.stationid
       self.office = self.corp.assets().result[stationid]["contents"][0]
  
   def get_content_from_container(self, containerid):
@@ -51,7 +52,7 @@ class Station:
     for asset in assets:
       if asset['id'] == containerid and is_container(asset['id']):
         return asset['contents']
-    raise('Could not find the container contents')
+    raise Exception('Could not find the container contents')
     
   #TODO add code for non-conquerable stations
   def fetch_station_id_from_api(self):

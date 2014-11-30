@@ -25,7 +25,7 @@ class Container:
   def fetch_container_id(self):
     if withmemcache:
       self.fetch_station_id_from_cache()
-      if(self.containerid is None)
+      if(self.containerid is None):
         self.fetch_container_id_from_api()
         self.store_container_id_in_cache()
     else:
@@ -41,14 +41,16 @@ class Container:
     contents = self.fetch_contents()
     quantities = Quantities()
     for item in contents:
-      quantities.add(item["item_type_id"], item["quantity"]
+      quantities.add(item["item_type_id"], item["quantity"])
     return quantities
     
   def fetch_container_id_from_api(self):
     containerids = self.station.get_all_container_ids()
+    if containerids is None:
+      raise Exception('Could not fetch container ids')
     locations = self.corp.locations(containerids).result
     for idlocation, location in locations.iteritems():
       if location['name'] == self.containername:
         self.containerid = idlocation
     if self.containerid is None:
-      raise('Could not fetch the container id.') 
+      raise Exception('Could not fetch the container id.') 
