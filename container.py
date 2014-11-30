@@ -22,7 +22,6 @@ class Container:
   def fetch_contents(self):
     self.station.fetch_assets()
     self.contents = self.station.get_content_from_container(self.containerid)
-    return self.contents
 
   def fetch_container_id(self):
     if withmemcache:
@@ -45,7 +44,7 @@ class Container:
       self.quantities.add(item["item_type_id"], item["quantity"])
     
   def fetch_container_id_from_api(self):
-    containerids = self.station.get_all_container_ids()
+    containerids = self.station.containerids
     if containerids is None:
       raise Exception('Could not fetch container ids')
     locations = self.corp.locations(containerids).result

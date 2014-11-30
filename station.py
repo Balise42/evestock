@@ -15,6 +15,7 @@ class Station:
     self.office = None
     self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
     self.fetch_station_id()
+    self.fetch_all_container_ids()
 
   def fetch_station_id(self):
     if withmemcache:
@@ -26,10 +27,9 @@ class Station:
       self.fetch_station_id_from_api()
     logging.info("%s", self.stationid)
         
-  def get_all_container_ids(self):
+  def fetch_all_container_ids(self):
     self.fetch_assets()
-    containerids = self.list_asset_if_container()
-    return containerids
+    self.containerids = self.list_asset_if_container()
 
   def list_asset_if_container(self):
     containerids = []
