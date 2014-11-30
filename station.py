@@ -33,6 +33,7 @@ class Station:
     for asset in self.assets:
       if self.is_container(asset):
         containerids.append(asset["id"])
+    return containerids
 
   def is_container(self, asset):
     return "contents" in asset
