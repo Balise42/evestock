@@ -14,6 +14,7 @@ class Station:
     self.eve = evelink.eve.EVE()
     self.office = None
     self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
+    self.fetch_station_id()
 
   def fetch_station_id(self):
     if withmemcache:
@@ -53,7 +54,7 @@ class Station:
   def get_content_from_container(self, containerid):
     assets = self.fetch_assets()
     for asset in assets:
-      if asset['id'] == containerid and is_container(asset['id']):
+      if asset['id'] == containerid and self.is_container(asset):
         return asset['contents']
     raise Exception('Could not find the container contents')
     
@@ -62,7 +63,6 @@ class Station:
     stations = self.eve.conquerable_stations().result
     for stationid, station in sorted(stations.iteritems()):
       if station["name"] == self.stationname:
-        logging.info("%s", station["name"])
         self.stationid = stationid+6000000
     return self.stationid
 

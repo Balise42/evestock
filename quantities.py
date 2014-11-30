@@ -10,3 +10,9 @@ class Quantities:
 
   def get_quantity(self, itemid):
     return self.quantities[itemid]
+
+  def __getitem__(self, itemid):
+    return self.get_quantity(itemid)
+
+  def contains_item(self, name):
+    return name in self.quantities

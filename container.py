@@ -6,7 +6,7 @@ try:
 except ImportError:
   withmemcache = False
 
-
+from quantities import Quantities
 from keys import keyid, vcode
 
 class Container:
@@ -15,11 +15,13 @@ class Container:
     self.station = station
     self.eve = evelink.eve.EVE()
     self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
+    self.fetch_container_id()
+    self.fetch_contents()
+    self.fetch_quantities()
 
   def fetch_contents(self):
-    self.fetch_container_id()
     self.station.fetch_assets()
-    self.contents = station.get_content_from_container(self.containerid)
+    self.contents = self.station.get_content_from_container(self.containerid)
     return self.contents
 
   def fetch_container_id(self):
@@ -37,12 +39,10 @@ class Container:
   def store_container_id_in_cache(self):
     memcache.add("containerid", self.containerid)
 
-  def get_quantities(self):
-    contents = self.fetch_contents()
-    quantities = Quantities()
-    for item in contents:
-      quantities.add(item["item_type_id"], item["quantity"])
-    return quantities
+  def fetch_quantities(self):
+    self.quantities = Quantities()
+    for item in self.contents:
+      self.quantities.add(item["item_type_id"], item["quantity"])
     
   def fetch_container_id_from_api(self):
     containerids = self.station.get_all_container_ids()

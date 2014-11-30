@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import sqlite3
 
-from skillbooks_stock import get_quantities
+from stock import Stock
 
-quantities = get_quantities()
+stock = Stock()
 
-for quantity in quantities:
+for quantity in stock.list_of_items:
     print quantity["name"], quantity["quantity"]
