@@ -1,7 +1,5 @@
 Just a little piece of code to get the number of skillbooks (or any item really) from a corp container in EVE Online.
 
-/!\ Current HEAD is a major refactoring operation, you probably don't want to use that. Version 0.9-dirty is, well, dirty, but should work.
-
 Requirements:
 * Depends on evelink: https://github.com/eve-val/evelink
 * is mostly a Google App Engine app, although there's a CLI that also gives results. You can also download a development appserver (https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) to run it locally.
