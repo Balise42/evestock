@@ -23,7 +23,4 @@ def get_container_id():
 
 def get_station_id():
   station = Station(stationname)
-  station.fetch_station_id()
-  logging.info("%s", station.stationname)
-  logging.info("%s", station.stationid)
   return station.stationid
