@@ -19,10 +19,10 @@ class IdExport:
       self.write_item_to_file(itemid, itemname)
 
   def write_item_to_file(self, itemid, itemname):
-      file_to_write.write(itemid.__str__())
-      file_to_write.write(' ')
-      file_to_write.write(itemname)
-      file_to_write.write('\n')
+      self.file_to_write.write(itemid.__str__())
+      self.file_to_write.write(' ')
+      self.file_to_write.write(itemname)
+      self.file_to_write.write('\n')
 
 if __name__ == '__main__':
   IdExport().run()
