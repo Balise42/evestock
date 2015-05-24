@@ -4,7 +4,6 @@ from google.appengine.api import memcache
 from update_ids import get_container_id, get_station_id
 
 
-
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         stationid = get_station_id()
