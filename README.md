@@ -1,9 +1,10 @@
 Just a little piece of code to get the number of skillbooks (or any item really) from a corp container in EVE Online.
 
 Requirements:
-* Depends on evelink: https://github.com/eve-val/evelink
+* Depends on evelink: https://github.com/eve-val/evelink:
+  - ``pip install -t lib evelink``
 * is mostly a Google App Engine app, although there's a CLI that also gives results. You can also download a development appserver (https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) to run it locally.
-* Create a file keys.py containing your keyid and vcode for a corp API key that can access Assets and Locations (16777218, to check). File should look like
+* Create a file keys.py containing your keyid and vcode for a corp API key that can access `AssetList` and `Locations` (Access Mask: `16777218`). File should look like
 ```python
 keyid = your_key_id
 vcode = 'your_vcode'
