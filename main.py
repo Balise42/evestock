@@ -16,9 +16,9 @@ class MainHandler(webapp2.RequestHandler):
       template = JINJA_ENVIRONMENT.get_template('index.html')
       self.response.write(template.render({'bookquantities': bookquantities}))
 
-    def handle_exception(self, exception, debug_mode):
-      template = JINJA_ENVIRONMENT.get_template('error.html')
-      self.response.write(template.render({'action' : error_action}))
+#    def handle_exception(self, exception, debug_mode):
+#      template = JINJA_ENVIRONMENT.get_template('error.html')
+#      self.response.write(template.render({'action' : error_action}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
