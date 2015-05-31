@@ -1,68 +1,38 @@
-withmemcache = True
-try:
-    from google.appengine.api import memcache
-except ImportError:
-    withmemcache = False
-
-from keys import keyid, vcode
+from common import corp, cache, idmap
 from config import (
-    allitems,
-    bookids,
-    booklist,
-    containername,
-    dbname,
-    stationname,
+    loc_aliases,
+    stations,
 )
-from container import Container
+from report import Report
 from station import Station
 
 
-class Stock:
+class Stock(object):
     def __init__(self):
-        self.station = Station(stationname)
-        self.container = Container(containername, self.station)
-        self.quantities = self.container.quantities
-        self.get_item_ids_from_db_dump()
-        self.compute_list_of_contents()
+        self.station = {}
+        self._stocks = {}
+        self.assets = self._get_assets()
 
-    def compute_list_of_contents(self):
-        booknames = [s.strip() for s in open(booklist)]
+        for stn_id, stn_data in stations.iteritems():
+            stn_name = idmap.stn[stn_id]
+            self.station[stn_name] = Station(stn_id, self.assets)
+            self._check_stocks(stn_name, stn_data)
 
-        bookquantities = []
-        for name in booknames:
-            quant = {}
-            quant["name"] = name
-            if name not in self.items:
-                quant["class"] = 'text-warning'
-                quant["quantity"] = 'ERROR'
-            elif self.quantities.contains_item(self.items[name]):
-                quant["quantity"] = self.quantities.get_quantity(
-                    self.items[name])
-                if self.quantities.get_quantity(self.items[name]) < 10:
-                    quant["class"] = 'text-danger'
-                else:
-                    quant["class"] = 'text-info'
-            else:
-                quant["quantity"] = 0
-                quant["class"] = 'text-danger'
-            bookquantities.append(quant)
+    def _get_assets(self):
+        return cache.lookup(
+            lambda: corp.assets().result,
+            "corpAssets", "corpAssets", 3600)
 
-        if(allitems):
-            for skillbook in self.container.contents:
-                if not self.itemsbyid[skillbook["item_type_id"]] in booknames:
-                    quant = {}
-                    quant["name"] = self.itemsbyid[skillbook["item_type_id"]]
-                    quant["class"] = 'text-warning'
-                    quant["quantity"] = self.quantities[
-                        skillbook["item_type_id"]]
-                    bookquantities.append(quant)
-        self.list_of_items = bookquantities
+    def _check_stocks(self, stn_name, stn_data):
+        stn_stocks = {}
+        for loc_alias, stock_list in stn_data.iteritems():
+            where = loc_aliases[loc_alias]
+            loc_encoded = "/".join(where)
+            stn_stocks.setdefault(loc_encoded, [])
+            for type_, target in stock_list:
+                have = self.station[stn_name].lookup(where, type_)
+                stn_stocks[loc_encoded].append([type_, target, have])
+        self._stocks[stn_name] = stn_stocks
 
-    def get_item_ids_from_db_dump(self):
-        lines = [s.strip() for s in open(bookids)]
-        self.items = {}
-        self.itemsbyid = {}
-        for line in lines:
-            [id, name] = line.split(' ', 1)
-            self.items[name] = int(id)
-            self.itemsbyid[int(id)] = name
+    def build_report(self):
+        return Report(self._stocks)
