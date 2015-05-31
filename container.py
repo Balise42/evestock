@@ -1,55 +1,87 @@
+import logging
+
 import evelink
 
-withmemcache = True
-try:
-  from google.appengine.api import memcache
-except ImportError:
-  withmemcache = False
+from common import (
+    cache,
+    corp,
+    idmap,
+)
 
-from quantities import Quantities
-from keys import keyid, vcode
+
+def parse_assets(location, assets):
+    ctr = Container()
+    for i in assets:
+        loc_flag = i['location_flag']
+        if loc_flag == idmap.invflag["Hangar"]:
+            ctr.add_hangars(i)
+        elif loc_flag == idmap.invflag["CorpMarket"]:
+            ctr.add_deliveries(i)
+    cache.save()
+    return ctr
+
 
 class Container:
-  def __init__(self, containername, station):
-    self.containername = containername
-    self.station = station
-    self.eve = evelink.eve.EVE()
-    self.corp = evelink.corp.Corp(evelink.api.API(api_key = (keyid, vcode)))
-    self.fetch_container_id()
-    self.fetch_contents()
-    self.fetch_quantities()
+    def __init__(self, prefix=None):
+        self.prefix = prefix
+        self.contents = {}
+        self.container = {}
 
-  def fetch_contents(self):
-    self.station.fetch_assets()
-    self.contents = self.station.get_content_from_container(self.containerid)
+    def add_hangars(self, assets):
+        hangars = Container(prefix="/hangar/")
+        for i in assets['contents']:
+            loc_flag = i['location_flag']
+            hangar_name = idmap.hangar[loc_flag]
+            prefix = "%s/" % hangar_name
+            hangar = hangars.container.setdefault(
+                hangar_name, Container(prefix))
+            hangar.add(i)
+        self.container['hangar'] = hangars
 
-  def fetch_container_id(self):
-    if withmemcache:
-      self.fetch_container_id_from_cache()
-      if(self.containerid is None):
-        self.fetch_container_id_from_api()
-        self.store_container_id_in_cache()
-    else:
-      self.fetch_container_id_from_api()
+    def add_deliveries(self, asset):
+        ctr = self.container.setdefault(
+            "deliveries", Container("/deliveries/"))
+        ctr.add(asset)
 
-  def fetch_container_id_from_cache(self):
-    self.containerid = memcache.get("containerid")
+    def add(self, entry):
+        type_ = idmap.item[entry['item_type_id']]
+        if 'contents' in entry:
+            if type_ == 'Plastic Wrap':
+                # Ignore courier packages.
+                return
+            name = self.lookup_name(entry['id'])
+            prefix = "%s%s/" % (self.prefix, name)
+            ctr = self.container.setdefault(name, Container(prefix))
+            for i in entry['contents']:
+                ctr.add(i)
+        else:
+            qty = entry['quantity']
+            self.contents.setdefault(type_, 0)
+            self.contents[type_] += qty
 
-  def store_container_id_in_cache(self):
-    memcache.add("containerid", self.containerid)
+    def lookup_name(self, id_):
+        try:
+            result = cache.lookup(
+                lambda: corp.locations(id_).result,
+                "locations", id_, 3600)
+            name = result[id_]['name']
+        except evelink.api.APIError:
+            name = "Unknown"
+        return name
 
-  def fetch_quantities(self):
-    self.quantities = Quantities()
-    for item in self.contents:
-      self.quantities.add(item["item_type_id"], item["quantity"])
-    
-  def fetch_container_id_from_api(self):
-    containerids = self.station.containerids
-    if containerids is None:
-      raise Exception('Could not fetch container ids')
-    locations = self.corp.locations(containerids).result
-    for idlocation, location in locations.iteritems():
-      if location['name'] == self.containername:
-        self.containerid = idlocation
-    if self.containerid is None:
-      raise Exception('Could not fetch the container id.') 
+    def print_(self):
+        for i in sorted(self.contents.keys()):
+            logging.debug("%s%s (%d)",
+                          self.prefix, i,
+                          self.contents[i])
+        for i in sorted(self.container.keys()):
+            self.container[i].print_()
+
+    def lookup(self, where, type_):
+        if len(where) == 0:
+            return self.contents.get(type_, 0)
+        else:
+            try:
+                return self.container[where[0]].lookup(where[1:], type_)
+            except KeyError:
+                return None

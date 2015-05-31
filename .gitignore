@@ -1,0 +1,6 @@
+.*.swp
+*pyc
+cache/*
+eve-dump.db
+keys.py
+lib/*
